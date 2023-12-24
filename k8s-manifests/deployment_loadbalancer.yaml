@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-html
+  namespace: apache-html
+spec:
+  selector:
+    matchLabels:
+      app: apache-html
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apache-html
+    spec:
+      containers:
+      - name: apache-html
+        image: sercanyz/apache-html:latest
+        ports:
+        - containerPort: 5000
+
+---
+  
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-html
+  namespace: apache-html
+spec:
+  type: LoadBalancer
+  selector:
+    app: apache-html
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apache-html
+  namespace: apache-html
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: "apache-html.com"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: apache-html
+            port:
+              number: 5000

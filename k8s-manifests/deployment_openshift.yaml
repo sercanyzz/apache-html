@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-html
+  namespace: apache-html
+spec:
+  selector:
+    matchLabels:
+      app: apache-html
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apache-html
+    spec:
+      containers:
+      - name: apache-html
+        image: sercanyz/apache-html:latest
+        ports:
+        - containerPort: 5000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-html
+  namespace: apache-html
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+  selector:
+    app:  apache-html
+  type: NodePort
